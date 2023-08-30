@@ -28,9 +28,9 @@ export const SideNav = () => {
                 },
             }}
             anchor="left"
-            variant="permanent" 
+            variant="permanent"
           >
-            <Toolbar></Toolbar>
+            <Toolbar/>
             <Divider/>  
             <List>
             {listItem.map((item) => (
