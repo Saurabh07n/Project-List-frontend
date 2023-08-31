@@ -65,6 +65,7 @@ export const ProjectList = () => {
     };
     tempArray[idx] = temp;
     setData(tempArray);
+    if(e.target.name === 'id') setSelectedRow(e.target.value);
   }
 
     return (
@@ -83,7 +84,7 @@ export const ProjectList = () => {
                     </TableHead>
                     <TableBody>
                     {data.map((row,idx) => (
-                        <StyledTableRow key={row.name}  >
+                        <StyledTableRow>
                           <StyledTableCell align="center">{row.serialNo}</StyledTableCell>
                           { Object.keys(row).map((key,i)=>{
                               return (
@@ -91,6 +92,7 @@ export const ProjectList = () => {
                                 <StyledTableCell key={i} align="center" id={row.id} onClick={handleClickInput}>
                                   { clickInput && selectedRow===row.id ?
                                     <TextField
+                                      autoComplete="on"
                                       id={row.id}
                                       variant="outlined"
                                       value={row[key]}
