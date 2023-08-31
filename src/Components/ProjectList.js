@@ -2,8 +2,7 @@ import { Box, TableContainer, Table, TableHead, TableRow, TableBody, TextField  
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
-import { useState } from "react";
-import { width } from "@mui/system";
+import { useEffect, useState } from "react";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -34,18 +33,38 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   }
   
   const rows = [
-    createData('1', 'PRJ1', 'Nimble Cafe', 'AK', 'Critical'),
-    createData('2', 'PRJ2', 'Nimble Retro', 'SN', 'High'),
+    createData('1', 'PRJ1', 'Nimble Cafe', 'AR', 'Critical'),
+    createData('2', 'PRJ2', 'Nimble Cafes', 'SN', 'High'),
+    createData('3', 'PRJ3', 'Swift Kanban', 'RK', 'Mid'),
   ];
 
 
 export const ProjectList = () => {
   const [clickInput,setClickInput] = useState(false);
   const [selectedRow,setSelectedRow] = useState('');
+  const [data,setData] = useState([]);
+
+  useEffect(()=> {
+    const temp = rows;
+    setData(rows);
+    console.log('Rendered!!')
+  },[]);
 
   const handleClickInput = (e) => {
     setClickInput(true);
     setSelectedRow(e.target.id);
+
+  }
+
+  const handleTextChange = (e,idx) => {
+    let temp = {...data[idx]};
+    let tempArray = [...data];
+    temp = {
+      ...temp,
+      [e.target.name]: e.target.value 
+    };
+    tempArray[idx] = temp;
+    setData(tempArray);
   }
 
     return (
@@ -63,13 +82,27 @@ export const ProjectList = () => {
                     </TableRow>
                     </TableHead>
                     <TableBody>
-                    {rows.map((row) => (
+                    {data.map((row,idx) => (
                         <StyledTableRow key={row.name}  >
                           <StyledTableCell align="center">{row.serialNo}</StyledTableCell>
-                          <StyledTableCell align="center" id={row.id} onClick={handleClickInput}>{clickInput && selectedRow===row.id?<TextField id={row.id} variant="outlined" />:row.id}</StyledTableCell>
-                          <StyledTableCell align="center" id={row.id} onClick={handleClickInput}>{clickInput && selectedRow===row.id?<TextField id={row.id} variant="outlined" />:row.name}</StyledTableCell>
-                          <StyledTableCell align="center" id={row.id} onClick={handleClickInput}>{clickInput && selectedRow===row.id?<TextField id={row.id} variant="outlined" />:row.owner}</StyledTableCell>
-                          <StyledTableCell align="center" id={row.id} onClick={handleClickInput}>{clickInput && selectedRow===row.id?<TextField id={row.id} variant="outlined" />:row.priority}</StyledTableCell>
+                          { Object.keys(row).map((key,i)=>{
+                              return (
+                                i!==0 &&
+                                <StyledTableCell key={i} align="center" id={row.id} onClick={handleClickInput}>
+                                  { clickInput && selectedRow===row.id ?
+                                    <TextField
+                                      id={row.id}
+                                      variant="outlined"
+                                      value={row[key]}
+                                      onChange={(e)=>handleTextChange(e,idx)}
+                                      inputProps={{
+                                        name: key
+                                      }}
+                                     />
+                                    :row[key] }
+                                </StyledTableCell>
+                                );
+                            }) }
                         </StyledTableRow>
                     ))}
                     </TableBody>
