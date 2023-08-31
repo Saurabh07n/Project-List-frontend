@@ -3,6 +3,7 @@ import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
 import { useEffect, useState } from "react";
+import axios from "axios";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -13,7 +14,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     },
     [`&.${tableCellClasses.body}`]: {
       fontSize: 14,
-      height: 56,
+      height: 32,
       padding:8
     },
   }));
@@ -45,10 +46,16 @@ export const ProjectList = () => {
   const [data,setData] = useState([]);
 
   useEffect(()=> {
-    const temp = rows;
-    setData(rows);
-    console.log('Rendered!!')
+    // Load();
+    (async () => await Load())();
   },[]);
+
+  async function Load() {
+    const result = await axios.get('http://localhost:8081/list');
+    setData(result.data);
+    console.log(result.data)
+
+  }
 
   const handleClickInput = (e) => {
     setClickInput(true);
@@ -84,11 +91,10 @@ export const ProjectList = () => {
                     </TableHead>
                     <TableBody>
                     {data.map((row,idx) => (
-                        <StyledTableRow>
-                          <StyledTableCell align="center">{row.serialNo}</StyledTableCell>
+                        <StyledTableRow key={`key-${idx}`}>
+                          <StyledTableCell align="center">{idx+1}</StyledTableCell>
                           { Object.keys(row).map((key,i)=>{
                               return (
-                                i!==0 &&
                                 <StyledTableCell key={i} align="center" id={row.id} onClick={handleClickInput}>
                                   { clickInput && selectedRow===row.id ?
                                     <TextField
