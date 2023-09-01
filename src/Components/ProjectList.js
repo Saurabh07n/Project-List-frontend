@@ -37,10 +37,6 @@ const StyledTableButton = styled(Button)(({ theme }) => ({
   borderRadius: '24px',
 }));
 
-function createData(serialNo, id, name, owner, priority) {
-  return { serialNo, id, name, owner, priority };
-}
-
 export const ProjectList = () => {
   const [clickInput,setClickInput] = useState(false);
   const [selectedRow,setSelectedRow] = useState('');
@@ -58,9 +54,13 @@ export const ProjectList = () => {
 
   async function Load() {
     try {
-      const result = await axios.get('http://localhost:8081/list');
-      setData(result.data);
-      console.log(result.data);
+      let result = await axios.get('http://localhost:8081/list');
+      result = result.data.map(element => ({
+        ...element,
+        created: true
+      }));
+      setData(result);
+      console.log(result);
     }
     catch(err) {
       alert(`Loading Project List Failed !!`)
@@ -170,7 +170,7 @@ export const ProjectList = () => {
                         <StyledTableCell align="center">Project Name</StyledTableCell>
                         <StyledTableCell align="center">Owner</StyledTableCell>
                         <StyledTableCell align="center">Priority</StyledTableCell>
-                        <StyledTableCell align="center">Option</StyledTableCell>
+                        {data.length !== 0 && <StyledTableCell align="center">Option</StyledTableCell>}
                     </TableRow>
                     </TableHead>
                     <TableBody>
@@ -179,8 +179,8 @@ export const ProjectList = () => {
                           <StyledTableCell align="center">{idx+1}</StyledTableCell>
                           { Object.keys(row).map((key,i)=>{
                               return (
-                                <StyledTableCell key={i} align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
-                                  { clickInput && selectedRow===row.id ?
+                                (key !== 'created') && <StyledTableCell key={i} align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                                  { ((clickInput && selectedRow===row.id) && !(key === 'id' && row.created)) || row.id === '' ?
                                     <TextField
                                       autoComplete="on"
                                       id={row.id}
@@ -203,7 +203,7 @@ export const ProjectList = () => {
                             <StyledTableCell align="center">
                               <Box sx={{display: 'flex', justifyContent: 'center'}}>
                                 <StyledTableButton size="medium" variant="contained" endIcon={<DeleteIcon />} onClick={(e)=>remove(e,idx)}>Delete</StyledTableButton>
-                                <StyledTableButton size="medium" variant="contained" endIcon={<SaveIcon />} onClick={save}>Save</StyledTableButton>
+                                <StyledTableButton size="medium" disabled={!(clickInput && selectedRow===row.id)} variant="contained" endIcon={<SaveIcon />} onClick={save}>Save</StyledTableButton>
                               </Box>
                             </StyledTableCell>
                         </StyledTableRow>
