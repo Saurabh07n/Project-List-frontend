@@ -16,9 +16,9 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
       
     },
     [`&.${tableCellClasses.body}`]: {
-      fontSize: 14,
-      height: 32,
-      padding:8
+      fontSize: 16,
+      height: '4px',
+      padding: 4  
     },
   }));
   
@@ -188,7 +188,12 @@ export const ProjectList = () => {
                                       value={row[key]}
                                       onChange={(e)=>handleTextChange(e,idx)}
                                       inputProps={{
-                                        name: key
+                                        name: key,
+                                        style: {
+                                          height: '12px',
+                                          fontSize: 18,
+                                          textAlign: 'center'
+                                        }
                                       }}
                                      />
                                     :row[key] }
@@ -197,8 +202,8 @@ export const ProjectList = () => {
                             }) }
                             <StyledTableCell align="center">
                               <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                                <StyledTableButton variant="contained" endIcon={<DeleteIcon />} onClick={(e)=>remove(e,idx)}>Delete</StyledTableButton>
-                                <StyledTableButton variant="contained" endIcon={<SaveIcon />} onClick={save}>Save</StyledTableButton>
+                                <StyledTableButton size="medium" variant="contained" endIcon={<DeleteIcon />} onClick={(e)=>remove(e,idx)}>Delete</StyledTableButton>
+                                <StyledTableButton size="medium" variant="contained" endIcon={<SaveIcon />} onClick={save}>Save</StyledTableButton>
                               </Box>
                             </StyledTableCell>
                         </StyledTableRow>
