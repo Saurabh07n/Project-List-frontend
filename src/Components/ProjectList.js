@@ -1,7 +1,10 @@
-import { Box, TableContainer, Table, TableHead, TableRow, TableBody, TextField  } from "@mui/material";
+import { Box, TableContainer, Table, TableHead, TableRow, TableBody, TextField, Button  } from "@mui/material";
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import { styled } from '@mui/material/styles';
 import Paper from '@mui/material/Paper';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SaveIcon from '@mui/icons-material/Save';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -19,48 +22,104 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     },
   }));
   
-  const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    '&:nth-of-type(odd)': {
-      backgroundColor: theme.palette.action.hover,
-    },
-    // hide last border
-    '&:last-child td, &:last-child th': {
-      border: 0,
-    },
-  }));
-  
-  function createData(serialNo, id, name, owner, priority) {
-    return { serialNo, id, name, owner, priority };
-  }
-  
-  const rows = [
-    createData('1', 'PRJ1', 'Nimble Cafe', 'AR', 'Critical'),
-    createData('2', 'PRJ2', 'Nimble Cafes', 'SN', 'High'),
-    createData('3', 'PRJ3', 'Swift Kanban', 'RK', 'Mid'),
-  ];
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(odd)': {
+    backgroundColor: theme.palette.action.hover,
+  },
+  // hide last border
+  '&:last-child td, &:last-child th': {
+    border: 0,
+  },
+}));
 
+const StyledTableButton = styled(Button)(({ theme }) => ({
+  margin: '8px',
+  borderRadius: '24px',
+}));
+
+function createData(serialNo, id, name, owner, priority) {
+  return { serialNo, id, name, owner, priority };
+}
 
 export const ProjectList = () => {
   const [clickInput,setClickInput] = useState(false);
   const [selectedRow,setSelectedRow] = useState('');
   const [data,setData] = useState([]);
+  const [listItem,setListItem] = useState({
+    id: '',
+    name: '',
+    owner: '',
+    priority: ''
+  });
 
   useEffect(()=> {
-    // Load();
     (async () => await Load())();
   },[]);
 
   async function Load() {
-    const result = await axios.get('http://localhost:8081/list');
-    setData(result.data);
-    console.log(result.data)
-
+    try {
+      const result = await axios.get('http://localhost:8081/list');
+      setData(result.data);
+      console.log(result.data);
+    }
+    catch(err) {
+      alert(`Loading Project List Failed !!`)
+    }
+    
   }
 
-  const handleClickInput = (e) => {
+  async function save(e) {
+    e.preventDefault();
+    try {
+      await axios.put("http://localhost:8081/list/" + listItem.id , {
+        id: listItem.id,
+        name: listItem.name,
+        owner: listItem.owner,
+        priority: listItem.priority
+      });
+      Load();
+      setClickInput(false);
+      setListItem({
+        id: '',
+        name: '',
+        owner: '',
+        priority: ''
+      });
+    }
+   catch(err) {
+      alert("Project List Update Failed !!");
+    }
+  }
+
+  async function remove(e,idx) {
+    e.preventDefault();
+
+    if(data[idx].id === '') {
+      removeRow(idx);
+      return;
+    }
+
+    try {
+      await axios.delete("http://localhost:8081/list/" + data[idx].id);
+      Load();
+      setClickInput(false);
+      }
+    catch(err) {
+        alert("Project List Deletion Failed !!");
+      }
+  }
+
+  const handleClickInput = (e,idx) => {
+    const item = data[idx];
+
     setClickInput(true);
     setSelectedRow(e.target.id);
-
+    setListItem({
+      id: item.id,
+      name: item.name,
+      owner: item.owner,
+      priority: item.priority
+    });
   }
 
   const handleTextChange = (e,idx) => {
@@ -73,6 +132,30 @@ export const ProjectList = () => {
     tempArray[idx] = temp;
     setData(tempArray);
     if(e.target.name === 'id') setSelectedRow(e.target.value);
+
+    setListItem({
+      id: temp.id,
+      name: temp.name,
+      owner: temp.owner,
+      priority: temp.priority
+    });
+  }
+
+  const addRow = () => {
+    let temp = [...data];
+    temp.push({
+      id: '',
+      name: '',
+      owner: '',
+      priority: ''
+    });
+    setData(temp);
+  }
+
+  const removeRow = () => {
+    let temp = [...data];
+    temp.pop();
+    setData(temp);
   }
 
     return (
@@ -87,6 +170,7 @@ export const ProjectList = () => {
                         <StyledTableCell align="center">Project Name</StyledTableCell>
                         <StyledTableCell align="center">Owner</StyledTableCell>
                         <StyledTableCell align="center">Priority</StyledTableCell>
+                        <StyledTableCell align="center">Option</StyledTableCell>
                     </TableRow>
                     </TableHead>
                     <TableBody>
@@ -95,7 +179,7 @@ export const ProjectList = () => {
                           <StyledTableCell align="center">{idx+1}</StyledTableCell>
                           { Object.keys(row).map((key,i)=>{
                               return (
-                                <StyledTableCell key={i} align="center" id={row.id} onClick={handleClickInput}>
+                                <StyledTableCell key={i} align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
                                   { clickInput && selectedRow===row.id ?
                                     <TextField
                                       autoComplete="on"
@@ -111,11 +195,20 @@ export const ProjectList = () => {
                                 </StyledTableCell>
                                 );
                             }) }
+                            <StyledTableCell align="center">
+                              <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                                <StyledTableButton variant="contained" endIcon={<DeleteIcon />} onClick={(e)=>remove(e,idx)}>Delete</StyledTableButton>
+                                <StyledTableButton variant="contained" endIcon={<SaveIcon />} onClick={save}>Save</StyledTableButton>
+                              </Box>
+                            </StyledTableCell>
                         </StyledTableRow>
                     ))}
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Button variant="outlined" startIcon={<AddCircleIcon/>} onClick={addRow} size="small" sx={{float: 'right',mr:0,mt:2, borderRadius: '24px', border: 1}} >
+              Add
+            </Button>
           </Box>
         </>
     );
