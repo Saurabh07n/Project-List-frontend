@@ -70,24 +70,49 @@ export const ProjectList = () => {
 
   async function save(e) {
     e.preventDefault();
-    try {
-      await axios.put("http://localhost:8081/list/" + listItem.id , {
-        id: listItem.id,
-        name: listItem.name,
-        owner: listItem.owner,
-        priority: listItem.priority
-      });
-      Load();
-      setClickInput(false);
-      setListItem({
-        id: '',
-        name: '',
-        owner: '',
-        priority: ''
-      });
+    if(!listItem.created) {
+      try {
+        await axios.post("http://localhost:8081/list", {
+          id: listItem.id,
+          name: listItem.name,
+          owner: listItem.owner,
+          priority: listItem.priority
+        });
+        Load();
+        setClickInput(false);
+        setListItem({
+          id: '',
+          name: '',
+          owner: '',
+          priority: ''
+        });
+      console.log('POST Request');
+      }
+      catch(err) {
+        alert("Project List Addition Failed !!");
+      }
     }
-   catch(err) {
-      alert("Project List Update Failed !!");
+    else {
+      try {
+        await axios.put("http://localhost:8081/list/" + listItem.id , {
+          id: listItem.id,
+          name: listItem.name,
+          owner: listItem.owner,
+          priority: listItem.priority
+        });
+        Load();
+        setClickInput(false);
+        setListItem({
+          id: '',
+          name: '',
+          owner: '',
+          priority: ''
+        });
+      console.log('PUT Request');
+      }
+    catch(err) {
+        alert("Project List Update Failed !!");
+      }
     }
   }
 
@@ -111,14 +136,14 @@ export const ProjectList = () => {
 
   const handleClickInput = (e,idx) => {
     const item = data[idx];
-
     setClickInput(true);
     setSelectedRow(e.target.id);
     setListItem({
       id: item.id,
       name: item.name,
       owner: item.owner,
-      priority: item.priority
+      priority: item.priority,
+      created: data[idx].created ? true: false
     });
   }
 
@@ -137,7 +162,8 @@ export const ProjectList = () => {
       id: temp.id,
       name: temp.name,
       owner: temp.owner,
-      priority: temp.priority
+      priority: temp.priority,
+      created: data[idx].created ? true: false
     });
   }
 
