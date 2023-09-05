@@ -70,8 +70,9 @@ export const ProjectList = () => {
         created: true,
         }
       });
-      setData(result); 
-      result.length ? setLastId(result[result.length-1].id) : setLastId('PRJ1');
+      setData(result);
+      console.log(result); 
+      result.length && setLastId(result[result.length-1].id);
     }
     catch(err) {
       alert(`Loading Project List Failed !! ${err}`);
@@ -83,7 +84,6 @@ export const ProjectList = () => {
     e.preventDefault();
 
     const obj = {
-      id: listItem.id,
       name: listItem.name,
       owner: listItem.owner,
       priority: listItem.priority
@@ -91,7 +91,8 @@ export const ProjectList = () => {
     
     if(!listItem.created) {
       try {
-        let id = lastId.substr(0,lastId.length-1) + (Number(lastId.substr(-1))+1);
+        let id = lastId !== '' ? lastId.substr(0,lastId.length-1) + (Number(lastId.substr(-1))+1) : 'PRJ1';
+        obj.id = id;
         await axios.post(url.api, obj);
         Load();
         console.log('POST Request');
@@ -102,6 +103,7 @@ export const ProjectList = () => {
     }
     else {
       try {
+        obj.id = listItem.id;
         await axios.put(url.api + listItem.id , obj);
         Load();
         console.log('PUT Request');
@@ -210,7 +212,7 @@ export const ProjectList = () => {
                           { Object.keys(row).map((key,i)=>{
                               return (
                                 (key !== 'created') && <StyledTableCell key={i} align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
-                                  { ((selectedRow===row.id) && !(key === 'id')) || row.id==='' ?
+                                  { ((selectedRow===row.id) && key !== 'id') ?
                                     <TextField
                                       autoComplete="on"
                                       id={row.id}
@@ -233,7 +235,7 @@ export const ProjectList = () => {
                             <StyledTableCell align="center">
                               <Box sx={{display: 'flex', justifyContent: 'center'}}>
                                 <StyledTableButton size="medium" variant="contained" endIcon={<DeleteIcon />} onClick={(e)=>remove(e,idx)}>Delete</StyledTableButton>
-                                <StyledTableButton size="medium" disabled={!(selectedRow===row.id && listItem.id !== '')} variant="contained" endIcon={<SaveIcon />} onClick={save}>Save</StyledTableButton>
+                                <StyledTableButton size="medium" disabled={(selectedRow !== row.id)} variant="contained" endIcon={<SaveIcon />} onClick={save}>Save</StyledTableButton>
                               </Box>
                             </StyledTableCell>
                         </StyledTableRow>
