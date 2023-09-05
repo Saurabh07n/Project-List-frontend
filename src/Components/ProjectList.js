@@ -7,6 +7,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { useEffect, useState } from "react";
 import axios from "axios";
+import url from '../Config/config'
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
@@ -54,16 +55,26 @@ export const ProjectList = () => {
 
   async function Load() {
     try {
-      let result = await axios.get('http://localhost:8081/list');
-      result = result.data.map(element => ({
-        ...element,
-        created: true
-      }));
+      let result = await axios.get(url.api);
+      result = result.data._embedded.list;
+
+      result = result.map((element) => {
+        let id = element._links.projectList.href;
+        id = id.substr(id.lastIndexOf('/')+1);
+
+        return {
+        id: id,
+        name: element.name,
+        owner: element.owner,
+        priority: element.priority,
+        created: true,
+        }
+      });
       setData(result);
       console.log(result);
     }
     catch(err) {
-      alert(`Loading Project List Failed !!`)
+      alert(`Loading Project List Failed !! ${err}`);
     }
     
   }
@@ -72,7 +83,7 @@ export const ProjectList = () => {
     e.preventDefault();
     if(!listItem.created) {
       try {
-        await axios.post("http://localhost:8081/list", {
+        await axios.post(url.api, {
           id: listItem.id,
           name: listItem.name,
           owner: listItem.owner,
@@ -94,7 +105,7 @@ export const ProjectList = () => {
     }
     else {
       try {
-        await axios.put("http://localhost:8081/list/" + listItem.id , {
+        await axios.put(url.api + listItem.id , {
           id: listItem.id,
           name: listItem.name,
           owner: listItem.owner,
@@ -125,7 +136,7 @@ export const ProjectList = () => {
     }
 
     try {
-      await axios.delete("http://localhost:8081/list/" + data[idx].id);
+      await axios.delete(url.api + data[idx].id);
       Load();
       setClickInput(false);
       }
@@ -229,7 +240,7 @@ export const ProjectList = () => {
                             <StyledTableCell align="center">
                               <Box sx={{display: 'flex', justifyContent: 'center'}}>
                                 <StyledTableButton size="medium" variant="contained" endIcon={<DeleteIcon />} onClick={(e)=>remove(e,idx)}>Delete</StyledTableButton>
-                                <StyledTableButton size="medium" disabled={!(clickInput && selectedRow===row.id)} variant="contained" endIcon={<SaveIcon />} onClick={save}>Save</StyledTableButton>
+                                <StyledTableButton size="medium" disabled={!(clickInput && selectedRow===row.id && listItem.id !== '')} variant="contained" endIcon={<SaveIcon />} onClick={save}>Save</StyledTableButton>
                               </Box>
                             </StyledTableCell>
                         </StyledTableRow>
