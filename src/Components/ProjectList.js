@@ -39,7 +39,6 @@ const StyledTableButton = styled(Button)(({ theme }) => ({
 }));
 
 export const ProjectList = () => {
-  const [clickInput,setClickInput] = useState(false);
   const [selectedRow,setSelectedRow] = useState('');
   const [data,setData] = useState([]);
   const [listItem,setListItem] = useState({
@@ -81,23 +80,19 @@ export const ProjectList = () => {
 
   async function save(e) {
     e.preventDefault();
+
+    const obj = {
+      id: listItem.id,
+      name: listItem.name,
+      owner: listItem.owner,
+      priority: listItem.priority
+    }
+    
     if(!listItem.created) {
       try {
-        await axios.post(url.api, {
-          id: listItem.id,
-          name: listItem.name,
-          owner: listItem.owner,
-          priority: listItem.priority
-        });
+        await axios.post(url.api, obj);
         Load();
-        setClickInput(false);
-        setListItem({
-          id: '',
-          name: '',
-          owner: '',
-          priority: ''
-        });
-      console.log('POST Request');
+        console.log('POST Request');
       }
       catch(err) {
         alert("Project List Addition Failed !!");
@@ -105,40 +100,36 @@ export const ProjectList = () => {
     }
     else {
       try {
-        await axios.put(url.api + listItem.id , {
-          id: listItem.id,
-          name: listItem.name,
-          owner: listItem.owner,
-          priority: listItem.priority
-        });
+        await axios.put(url.api + listItem.id , obj);
         Load();
-        setClickInput(false);
-        setListItem({
-          id: '',
-          name: '',
-          owner: '',
-          priority: ''
-        });
-      console.log('PUT Request');
+        console.log('PUT Request');
       }
     catch(err) {
         alert("Project List Update Failed !!");
       }
     }
+
+    setSelectedRow('');
+    setListItem({
+      id: '',
+      name: '',
+      owner: '',
+      priority: ''
+    });
   }
 
   async function remove(e,idx) {
     e.preventDefault();
 
     if(data[idx].id === '') {
-      removeRow(idx);
+      removeRow();
       return;
     }
 
     try {
       await axios.delete(url.api + data[idx].id);
       Load();
-      setClickInput(false);
+      setSelectedRow('');
       }
     catch(err) {
         alert("Project List Deletion Failed !!");
@@ -147,7 +138,6 @@ export const ProjectList = () => {
 
   const handleClickInput = (e,idx) => {
     const item = data[idx];
-    setClickInput(true);
     setSelectedRow(e.target.id);
     setListItem({
       id: item.id,
@@ -167,7 +157,7 @@ export const ProjectList = () => {
     };
     tempArray[idx] = temp;
     setData(tempArray);
-    if(e.target.name === 'id') setSelectedRow(e.target.value);
+    if(e.target.name === 'id') setSelectedRow(e.target.value); 
 
     setListItem({
       id: temp.id,
@@ -187,6 +177,7 @@ export const ProjectList = () => {
       priority: ''
     });
     setData(temp);
+    // setSelectedRow('');
   }
 
   const removeRow = () => {
@@ -217,7 +208,7 @@ export const ProjectList = () => {
                           { Object.keys(row).map((key,i)=>{
                               return (
                                 (key !== 'created') && <StyledTableCell key={i} align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
-                                  { ((clickInput && selectedRow===row.id) && !(key === 'id' && row.created)) || row.id === '' ?
+                                  { ((selectedRow===row.id) && !(key === 'id')) || row.id==='' ?
                                     <TextField
                                       autoComplete="on"
                                       id={row.id}
@@ -240,7 +231,7 @@ export const ProjectList = () => {
                             <StyledTableCell align="center">
                               <Box sx={{display: 'flex', justifyContent: 'center'}}>
                                 <StyledTableButton size="medium" variant="contained" endIcon={<DeleteIcon />} onClick={(e)=>remove(e,idx)}>Delete</StyledTableButton>
-                                <StyledTableButton size="medium" disabled={!(clickInput && selectedRow===row.id && listItem.id !== '')} variant="contained" endIcon={<SaveIcon />} onClick={save}>Save</StyledTableButton>
+                                <StyledTableButton size="medium" disabled={!(selectedRow===row.id && listItem.id !== '')} variant="contained" endIcon={<SaveIcon />} onClick={save}>Save</StyledTableButton>
                               </Box>
                             </StyledTableCell>
                         </StyledTableRow>
