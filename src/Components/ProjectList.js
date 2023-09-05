@@ -41,6 +41,7 @@ const StyledTableButton = styled(Button)(({ theme }) => ({
 export const ProjectList = () => {
   const [selectedRow,setSelectedRow] = useState('');
   const [data,setData] = useState([]);
+  const [lastId,setLastId] = useState('');
   const [listItem,setListItem] = useState({
     id: '',
     name: '',
@@ -69,8 +70,8 @@ export const ProjectList = () => {
         created: true,
         }
       });
-      setData(result);
-      console.log(result);
+      setData(result); 
+      result.length ? setLastId(result[result.length-1].id) : setLastId('PRJ1');
     }
     catch(err) {
       alert(`Loading Project List Failed !! ${err}`);
@@ -90,6 +91,7 @@ export const ProjectList = () => {
     
     if(!listItem.created) {
       try {
+        let id = lastId.substr(0,lastId.length-1) + (Number(lastId.substr(-1))+1);
         await axios.post(url.api, obj);
         Load();
         console.log('POST Request');
