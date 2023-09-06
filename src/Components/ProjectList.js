@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Box, TableContainer, Table, TableHead, TableRow, TableBody, TextField, Button  } from "@mui/material";
 import TableCell, { tableCellClasses } from '@mui/material/TableCell';
 import { styled } from '@mui/material/styles';
@@ -5,8 +7,9 @@ import Paper from '@mui/material/Paper';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SaveIcon from '@mui/icons-material/Save';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { useEffect, useState } from "react";
-import axios from "axios";
+import FormControl from '@mui/material/FormControl';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
 import url from '../Config/config'
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -42,6 +45,7 @@ export const ProjectList = () => {
   const [selectedRow,setSelectedRow] = useState('');
   const [data,setData] = useState([]);
   const [lastId,setLastId] = useState('');
+  const [priorirty,setPriority] = useState('');
   const [listItem,setListItem] = useState({
     id: '',
     name: '',
@@ -124,7 +128,6 @@ export const ProjectList = () => {
 
   async function remove(e,idx) {
     e.preventDefault();
-
     if(data[idx].id === '') {
       removeRow();
       return;
@@ -132,12 +135,19 @@ export const ProjectList = () => {
 
     try {
       await axios.delete(url.api + data[idx].id);
-      Load();
       setSelectedRow('');
+      setLastId('');
+      Load();
       }
     catch(err) {
         alert("Project List Deletion Failed !!");
       }
+  }
+
+  const removeRow = () => {
+    let temp = [...data];
+    temp.pop();
+    setData(temp);
   }
 
   const handleClickInput = (e,idx) => {
@@ -172,6 +182,10 @@ export const ProjectList = () => {
     });
   }
 
+  const handlePriorityChange = (e) => {
+    setPriority(e.target.value);
+  }
+
   const addRow = () => {
     let temp = [...data];
     temp.push({
@@ -184,15 +198,13 @@ export const ProjectList = () => {
     // setSelectedRow('');
   }
 
-  const removeRow = () => {
-    let temp = [...data];
-    temp.pop();
-    setData(temp);
-  }
-
     return (
         <>
           <Box sx={{position:'relative', left: 280, top: 120,px:'4%', width: 'calc(92% - 280px)' }}>
+            <Button variant="outlined" startIcon={<AddCircleIcon/>} onClick={addRow} size="small" sx={{float: 'right',mr:0,mb:1, borderRadius: '24px', border: 1}} >
+              Add
+            </Button>
+            
             <TableContainer component={Paper}>
                 <Table  aria-label="customized table">
                     <TableHead>
@@ -209,43 +221,83 @@ export const ProjectList = () => {
                     {data.map((row,idx) => (
                         <StyledTableRow key={`key-${idx}`}>
                           <StyledTableCell align="center">{idx+1}</StyledTableCell>
-                          { Object.keys(row).map((key,i)=>{
-                              return (
-                                (key !== 'created') && <StyledTableCell key={i} align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
-                                  { ((selectedRow===row.id) && key !== 'id') ?
-                                    <TextField
-                                      autoComplete="on"
-                                      id={row.id}
-                                      variant="outlined"
-                                      value={row[key]}
-                                      onChange={(e)=>handleTextChange(e,idx)}
-                                      inputProps={{
-                                        name: key,
-                                        style: {
-                                          height: '12px',
-                                          fontSize: 18,
-                                          textAlign: 'center'
-                                        }
-                                      }}
-                                     />
-                                    :row[key] }
-                                </StyledTableCell>
-                                );
-                            }) }
-                            <StyledTableCell align="center">
-                              <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                                <StyledTableButton size="medium" variant="contained" endIcon={<DeleteIcon />} onClick={(e)=>remove(e,idx)}>Delete</StyledTableButton>
-                                <StyledTableButton size="medium" disabled={(selectedRow !== row.id)} variant="contained" endIcon={<SaveIcon />} onClick={save}>Save</StyledTableButton>
-                              </Box>
-                            </StyledTableCell>
+
+                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                           {row.id}
+                          </StyledTableCell>
+
+                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                            { (selectedRow===row.id) || !row.created ?
+                              <TextField
+                                autoComplete="on"
+                                id={row.id}
+                                variant="outlined"
+                                value={row.name}
+                                onChange={(e)=>handleTextChange(e,idx)}
+                                inputProps={{
+                                  name: 'name',
+                                  style: {
+                                    height: '12px',
+                                    fontSize: 18,
+                                    textAlign: 'center'
+                                  }
+                                }}
+                                />
+                              :row.name }
+                          </StyledTableCell>
+
+                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                            { (selectedRow===row.id) || !row.created ?
+                              <TextField
+                                autoComplete="on"
+                                id={row.id}
+                                variant="outlined"
+                                value={row.owner}
+                                onChange={(e)=>handleTextChange(e,idx)}
+                                inputProps={{
+                                  name: 'owner',
+                                  style: {
+                                    height: '12px',
+                                    fontSize: 18,
+                                    textAlign: 'center'
+                                  }
+                                }}
+                                />
+                              :row.owner }
+                          </StyledTableCell>
+
+                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                            { (selectedRow===row.id) || !row.created ?
+                              <TextField
+                                autoComplete="on"
+                                id={row.id}
+                                variant="outlined"
+                                value={row.priority}
+                                onChange={(e)=>handleTextChange(e,idx)}
+                                inputProps={{
+                                  name: 'priority',
+                                  style: {
+                                    height: '12px',
+                                    fontSize: 18,
+                                    textAlign: 'center'
+                                  }
+                                }}
+                                />
+                              :row.priority }
+                            
+                          </StyledTableCell>
+
+                          <StyledTableCell align="center">
+                            <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                              <StyledTableButton size="medium" variant="contained" endIcon={<DeleteIcon />} onClick={(e)=>remove(e,idx)}>Delete</StyledTableButton>
+                              <StyledTableButton size="medium" disabled={(selectedRow !== row.id)} variant="contained" endIcon={<SaveIcon />} onClick={save}>Save</StyledTableButton>
+                            </Box>
+                          </StyledTableCell>
                         </StyledTableRow>
                     ))}
                     </TableBody>
                 </Table>
             </TableContainer>
-            <Button variant="outlined" startIcon={<AddCircleIcon/>} onClick={addRow} size="small" sx={{float: 'right',mr:0,mt:2, borderRadius: '24px', border: 1}} >
-              Add
-            </Button>
           </Box>
         </>
     );
