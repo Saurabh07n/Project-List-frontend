@@ -45,7 +45,6 @@ export const ProjectList = () => {
   const [selectedRow,setSelectedRow] = useState('');
   const [data,setData] = useState([]);
   const [lastId,setLastId] = useState('');
-  const [priorirty,setPriority] = useState('');
   const [listItem,setListItem] = useState({
     id: '',
     name: '',
@@ -171,7 +170,6 @@ export const ProjectList = () => {
     };
     tempArray[idx] = temp;
     setData(tempArray);
-    if(e.target.name === 'id') setSelectedRow(e.target.value); 
 
     setListItem({
       id: temp.id,
@@ -180,10 +178,6 @@ export const ProjectList = () => {
       priority: temp.priority,
       created: data[idx].created ? true: false
     });
-  }
-
-  const handlePriorityChange = (e) => {
-    setPriority(e.target.value);
   }
 
   const addRow = () => {
@@ -219,14 +213,14 @@ export const ProjectList = () => {
                     </TableHead>
                     <TableBody>
                     {data.map((row,idx) => (
-                        <StyledTableRow key={`key-${idx}`}>
+                        <StyledTableRow key={`key-${idx}`} onClick={(e) => handleClickInput(e,idx)}>
                           <StyledTableCell align="center">{idx+1}</StyledTableCell>
 
-                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                          <StyledTableCell align="center" id={row.id}>
                            {row.id}
                           </StyledTableCell>
 
-                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                          <StyledTableCell align="center" id={row.id}>
                             { (selectedRow===row.id) || !row.created ?
                               <TextField
                                 autoComplete="on"
@@ -246,7 +240,7 @@ export const ProjectList = () => {
                               :row.name }
                           </StyledTableCell>
 
-                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                          <StyledTableCell align="center" id={row.id}>
                             { (selectedRow===row.id) || !row.created ?
                               <TextField
                                 autoComplete="on"
@@ -266,12 +260,10 @@ export const ProjectList = () => {
                               :row.owner }
                           </StyledTableCell>
 
-                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
-                            { (selectedRow===row.id) || !row.created ?
-                              <TextField
-                                autoComplete="on"
-                                id={row.id}
-                                variant="outlined"
+                          <StyledTableCell align="center" id={row.id} >
+                          { (selectedRow===row.id) || !row.created ?
+                            <FormControl fullWidth >
+                              <Select
                                 value={row.priority}
                                 onChange={(e)=>handleTextChange(e,idx)}
                                 inputProps={{
@@ -282,9 +274,14 @@ export const ProjectList = () => {
                                     textAlign: 'center'
                                   }
                                 }}
-                                />
-                              :row.priority }
-                            
+                              >
+                                <MenuItem id={row.id} value='critical'>Critical</MenuItem>
+                                <MenuItem id={row.id} value='high'>High</MenuItem>
+                                <MenuItem id={row.id} value='mid'>Mid</MenuItem>
+                                <MenuItem id={row.id} value='low'>Low</MenuItem>
+                              </Select>
+                            </FormControl>
+                            :row.priority }
                           </StyledTableCell>
 
                           <StyledTableCell align="center">
