@@ -189,7 +189,6 @@ export const ProjectList = () => {
       priority: ''
     });
     setData(temp);
-    // setSelectedRow('');
   }
 
     return (
@@ -213,14 +212,14 @@ export const ProjectList = () => {
                     </TableHead>
                     <TableBody>
                     {data.map((row,idx) => (
-                        <StyledTableRow key={`key-${idx}`} onClick={(e) => handleClickInput(e,idx)}>
+                        <StyledTableRow key={`key-${idx}`}>
                           <StyledTableCell align="center">{idx+1}</StyledTableCell>
 
-                          <StyledTableCell align="center" id={row.id}>
+                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
                            {row.id}
                           </StyledTableCell>
 
-                          <StyledTableCell align="center" id={row.id}>
+                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
                             { (selectedRow===row.id) || !row.created ?
                               <TextField
                                 autoComplete="on"
@@ -238,9 +237,9 @@ export const ProjectList = () => {
                                 }}
                                 />
                               :row.name }
-                          </StyledTableCell>
+                          </StyledTableCell> 
 
-                          <StyledTableCell align="center" id={row.id}>
+                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
                             { (selectedRow===row.id) || !row.created ?
                               <TextField
                                 autoComplete="on"
@@ -260,29 +259,32 @@ export const ProjectList = () => {
                               :row.owner }
                           </StyledTableCell>
 
+                          { ((selectedRow===row.id) || !row.created) ?
                           <StyledTableCell align="center" id={row.id} >
-                          { (selectedRow===row.id) || !row.created ?
-                            <FormControl fullWidth >
+                            <FormControl fullWidth sx= {{
+                                  height: '12px',
+                                  fontSize: 18,
+                                  textAlign: 'center',
+                                  
+                                }}>
                               <Select
                                 value={row.priority}
                                 onChange={(e)=>handleTextChange(e,idx)}
                                 inputProps={{
                                   name: 'priority',
-                                  style: {
-                                    height: '12px',
-                                    fontSize: 18,
-                                    textAlign: 'center'
-                                  }
                                 }}
-                              >
-                                <MenuItem id={row.id} value='critical'>Critical</MenuItem>
-                                <MenuItem id={row.id} value='high'>High</MenuItem>
-                                <MenuItem id={row.id} value='mid'>Mid</MenuItem>
-                                <MenuItem id={row.id} value='low'>Low</MenuItem>
+                                >
+                                <MenuItem id={row.id} value='Critical'>Critical</MenuItem>
+                                <MenuItem id={row.id} value='High'>High</MenuItem>
+                                <MenuItem id={row.id} value='Mid'>Mid</MenuItem>
+                                <MenuItem id={row.id} value='Low'>Low</MenuItem>
                               </Select>
                             </FormControl>
-                            :row.priority }
                           </StyledTableCell>
+                          :
+                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                            {row.priority}
+                            </StyledTableCell> }
 
                           <StyledTableCell align="center">
                             <Box sx={{display: 'flex', justifyContent: 'center'}}>
