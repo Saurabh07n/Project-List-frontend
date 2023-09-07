@@ -261,17 +261,17 @@ export const ProjectList = () => {
 
                           { ((selectedRow===row.id) || !row.created) ?
                           <StyledTableCell align="center" id={row.id} >
-                            <FormControl fullWidth sx= {{
-                                  height: '12px',
-                                  fontSize: 18,
-                                  textAlign: 'center',
-                                  
-                                }}>
+                            <FormControl fullWidth>
                               <Select
                                 value={row.priority}
                                 onChange={(e)=>handleTextChange(e,idx)}
                                 inputProps={{
                                   name: 'priority',
+                                }}
+                                sx={{
+                                  fontSize: 18,
+                                  textAlign: 'center',
+                                  height: '45px',
                                 }}
                                 >
                                 <MenuItem id={row.id} value='Critical'>Critical</MenuItem>
