@@ -20,6 +20,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const StyledTextarea = styled(TextareaAutosize)(
   ({ theme }) => `
+  width: 84%;
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.2;
@@ -211,6 +212,17 @@ export const ProjectList = () => {
     });
   }
 
+  const handleDateChange = (val,idx) => {
+    const str = val.format('DD/MM/YYYY');
+    const obj = {
+      target: {
+        name: 'endDate',
+        value: str
+      }
+    };
+    handleTextChange(obj,idx);
+  }
+
   const addRow = () => {
     let temp = [...data];
     temp.push({...emptyList});
@@ -270,15 +282,13 @@ export const ProjectList = () => {
                           { ((selectedRow===row.id) || !row.created) ?
                           <StyledTableCell align="center" id={row.id} sx={{pt: '8px !important'}}>
                             <StyledTextarea
-                              multiline='true'
                               maxRows={2}
                               minRows={2}
-                              aria-label="maximum height"
                               placeholder="describe your project"
                               value={row.description}
                               onChange={(e)=>handleTextChange(e,idx)}
                               name= 'description'
-                              // maxLength={46}
+                              maxLength={50}
                             />
                           </StyledTableCell>
                           :
@@ -307,7 +317,7 @@ export const ProjectList = () => {
                           </StyledTableCell>
 
                           { ((selectedRow===row.id) || !row.created) ?
-                          <StyledTableCell align="center" id={row.id} >
+                          <StyledTableCell align="center">
                             <FormControl fullWidth>
                               <Select
                                 value={row.priority}
@@ -321,27 +331,37 @@ export const ProjectList = () => {
                                   height: '45px',
                                 }}
                                 >
-                                <MenuItem id={row.id} value='Critical'>Critical</MenuItem>
-                                <MenuItem id={row.id} value='High'>High</MenuItem>
-                                <MenuItem id={row.id} value='Mid'>Mid</MenuItem>
-                                <MenuItem id={row.id} value='Low'>Low</MenuItem>
+                                <MenuItem value='Critical'>Critical</MenuItem>
+                                <MenuItem value='High'>High</MenuItem>
+                                <MenuItem value='Mid'>Mid</MenuItem>
+                                <MenuItem value='Low'>Low</MenuItem>
                               </Select>
                             </FormControl>
                           </StyledTableCell>
                           :
                           <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
                             {row.priority}
-                            </StyledTableCell> }
+                          </StyledTableCell> }
 
-                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
-                            {/* { (selectedRow===row.id) || !row.created ? */}
-                              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DatePicker
-                                  defaultValue={dayjs('2022-0417')}
-                                />
-                              </LocalizationProvider>
-                              {/* :row.owner } */}
+                          { ((selectedRow===row.id) || !row.created) ?
+                          <StyledTableCell align="center">
+                            <LocalizationProvider dateAdapter={AdapterDayjs} name= 'endDate'>
+                              <DatePicker
+                                slotProps={{
+                                  textField: {
+                                    name: 'endDate'
+                                  }
+                                }}
+                                value={dayjs(row.endDate)}
+                                onChange={(val) => handleDateChange(val,idx)}
+                                format="DD/MM/YYYY"
+                              />
+                            </LocalizationProvider>
                           </StyledTableCell>
+                          : 
+                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                            {row.endDate || 'NA'}
+                          </StyledTableCell> }
 
                           <StyledTableCell align="center">
                             <Box sx={{display: 'flex', justifyContent: 'center'}}>
