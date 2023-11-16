@@ -59,14 +59,9 @@ export const ProjectList = () => {
   async function Load() {
     try {
       let result = await axios.get(url.api);
-      result = result.data._embedded.list;
-
-      result = result.map((element) => {
-        let id = element._links.projectList.href;
-        id = id.substr(id.lastIndexOf('/')+1);
-
+      result = result.data.map((element) => {
         return {
-        id: id,
+        id: element.id,
         name: element.name,
         owner: element.owner,
         priority: element.priority,
