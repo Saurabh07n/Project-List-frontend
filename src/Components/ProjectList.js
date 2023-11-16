@@ -110,7 +110,6 @@ export const ProjectList = () => {
       result = result.data.map((element) => {
         return {
           ...provideListItem(element),
-          id: id,
           created: true,
         }
       });
