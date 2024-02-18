@@ -77,7 +77,7 @@ export const ProjectList = () => {
   const emptyList = {
     id: '',
     name: '',
-    owner: '',
+    ownerList: '',
     priority: '',
     description: '',
     endDate: ''
@@ -96,7 +96,7 @@ export const ProjectList = () => {
   const provideListItem = (item) => ({
     id: item.id,
     name: item.name,
-    owner: item.owner,
+    ownerList: item.ownerList,
     priority: item.priority,
     description: item.description,
     endDate: item.endDate,
@@ -273,145 +273,143 @@ export const ProjectList = () => {
     setProjectsData(data);
   }
 
+  return (
+    <>
+      <Box sx={{position:'relative', left: 280, top: 120,px:'4%', width: 'calc(92% - 280px)' }}>
+        <Button variant="outlined" disabled={!isNameUnique} startIcon={<AddCircleIcon/>} onClick={addRow} size="small" sx={{float: 'right',mr:0,mb:1, borderRadius: '24px', border: 1}} >
+          Add
+        </Button>
+        
+        <TableContainer component={Paper}>
+          <Table  aria-label="customized table">
+            <TableHead>
+            <TableRow>
+              <StyledTableCell style={{width:'5%'}} align="center">#</StyledTableCell>
+              <StyledTableCell align="center" onClick={sortTableById}>Project ID</StyledTableCell>
+              <StyledTableCell align="center" onClick={sortTableByName}>Project Name</StyledTableCell>
+              <StyledTableCell align="center" sx={{width: '15% !important'}}>Description</StyledTableCell>
+              <StyledTableCell align="center">Owner</StyledTableCell>
+              <StyledTableCell align="center" onClick={sortTableByPriority}>Priority</StyledTableCell>
+              <StyledTableCell align="center">End Date</StyledTableCell>
+              {projectsData.length !== 0 && <StyledTableCell align="center">Option</StyledTableCell>}
+            </TableRow>
+            </TableHead>
+            <TableBody>
+            {projectsData.map((row,idx) => (
+              <StyledTableRow key={`key-${idx}`}>
+                <StyledTableCell align="center">{idx+1}</StyledTableCell>
 
+                <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                  {row.id}
+                </StyledTableCell>
 
-    return (
-        <>
-          <Box sx={{position:'relative', left: 280, top: 120,px:'4%', width: 'calc(92% - 280px)' }}>
-            <Button variant="outlined" disabled={!isNameUnique} startIcon={<AddCircleIcon/>} onClick={addRow} size="small" sx={{float: 'right',mr:0,mb:1, borderRadius: '24px', border: 1}} >
-              Add
-            </Button>
-            
-            <TableContainer component={Paper}>
-                <Table  aria-label="customized table">
-                    <TableHead>
-                    <TableRow>
-                        <StyledTableCell style={{width:'5%'}} align="center">#</StyledTableCell>
-                        <StyledTableCell align="center" onClick={sortTableById}>Project ID</StyledTableCell>
-                        <StyledTableCell align="center" onClick={sortTableByName}>Project Name</StyledTableCell>
-                        <StyledTableCell align="center" sx={{width: '15% !important'}}>Description</StyledTableCell>
-                        <StyledTableCell align="center">Owner</StyledTableCell>
-                        <StyledTableCell align="center" onClick={sortTableByPriority}>Priority</StyledTableCell>
-                        <StyledTableCell align="center">End Date</StyledTableCell>
-                        {projectsData.length !== 0 && <StyledTableCell align="center">Option</StyledTableCell>}
-                    </TableRow>
-                    </TableHead>
-                    <TableBody>
-                    {projectsData.map((row,idx) => (
-                        <StyledTableRow key={`key-${idx}`}>
-                          <StyledTableCell align="center">{idx+1}</StyledTableCell>
+                <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                  { (selectedRow===row.id) || !row.created ?
+                    <TextField
+                      autoComplete="on"
+                      id={row.id}
+                      variant="outlined"
+                      value={row.name}
+                      onChange={(e)=>handleProjDetailsChange(e,idx)}
+                      inputProps={{
+                        name: 'name',
+                        style: {
+                          height: '12px',
+                          fontSize: 18,
+                          textAlign: 'center'
+                        }
+                      }}
+                      error={!isNameUnique}
+                      helperText={!isNameUnique && 'name must be unique'}
+                      />
+                    :row.name }
+                </StyledTableCell> 
 
-                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
-                           {row.id}
-                          </StyledTableCell>
+                { ((selectedRow===row.id) || !row.created) ?
+                <StyledTableCell align="center" id={row.id} sx={{pt: '8px !important'}}>
+                  <StyledTextarea
+                    // multiline='true'
+                    maxRows={2}
+                    minRows={2}
+                    placeholder="describe your project"
+                    value={row.description}
+                    onChange={(e)=>handleProjDetailsChange(e,idx)}
+                    name= 'description'
+                    maxLength={50}
+                  />
+                </StyledTableCell>
+                :
+                <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                  {row.description}
+                </StyledTableCell> }                          
 
-                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
-                            { (selectedRow===row.id) || !row.created ?
-                              <TextField
-                                autoComplete="on"
-                                id={row.id}
-                                variant="outlined"
-                                value={row.name}
-                                onChange={(e)=>handleProjDetailsChange(e,idx)}
-                                inputProps={{
-                                  name: 'name',
-                                  style: {
-                                    height: '12px',
-                                    fontSize: 18,
-                                    textAlign: 'center'
-                                  }
-                                }}
-                                error={!isNameUnique}
-                                helperText={!isNameUnique && 'name must be unique'}
-                                />
-                              :row.name }
-                          </StyledTableCell> 
+                { ((selectedRow===row.id) || !row.created) ?
+                <StyledTableCell align="center" id={row.id}>
+                  <OwnerList handleProjDetailsChange={(e)=>handleProjDetailsChange(e,idx)}/>
+                </StyledTableCell>
+                :
+                <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                  {row.ownerList && row.ownerList.join(", ")}
+                </StyledTableCell> }
 
-                          { ((selectedRow===row.id) || !row.created) ?
-                          <StyledTableCell align="center" id={row.id} sx={{pt: '8px !important'}}>
-                            <StyledTextarea
-                              // multiline='true'
-                              maxRows={2}
-                              minRows={2}
-                              placeholder="describe your project"
-                              value={row.description}
-                              onChange={(e)=>handleProjDetailsChange(e,idx)}
-                              name= 'description'
-                              maxLength={50}
-                            />
-                          </StyledTableCell>
-                          :
-                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
-                            {row.description}
-                          </StyledTableCell> }                          
+                { ((selectedRow===row.id) || !row.created) ?
+                <StyledTableCell align="center">
+                  <FormControl fullWidth>
+                    <Select
+                      value={row.priority}
+                      onChange={(e)=>handleProjDetailsChange(e,idx)}
+                      inputProps={{
+                        name: 'priority',
+                      }}
+                      sx={{
+                        fontSize: 18,
+                        textAlign: 'center',
+                        height: '45px',
+                      }}
+                      >
+                      <MenuItem value='Critical'>Critical</MenuItem>
+                      <MenuItem value='High'>High</MenuItem>
+                      <MenuItem value='Mid'>Mid</MenuItem>
+                      <MenuItem value='Low'>Low</MenuItem>
+                    </Select>
+                  </FormControl>
+                </StyledTableCell>
+                :
+                <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                  {row.priority}
+                </StyledTableCell> }
 
-                          { ((selectedRow===row.id) || !row.created) ?
-                          <StyledTableCell align="center" id={row.id}>
-                            <OwnerList handleProjDetailsChange={(e)=>handleProjDetailsChange(e,idx)}/>
-                          </StyledTableCell>
-                          :
-                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
-                            {row.owner}
-                          </StyledTableCell> }
+                { ((selectedRow===row.id) || !row.created) ?
+                <StyledTableCell align="center">
+                  <LocalizationProvider dateAdapter={AdapterDayjs} name= 'endDate'>
+                    <DatePicker
+                      slotProps={{
+                        textField: {
+                          name: 'endDate'
+                        }
+                      }}
+                      onChange={(val) => handleDateChange(val,idx)}
+                      format="DD/MM/YYYY"
+                    />
+                  </LocalizationProvider>
+                </StyledTableCell>
+                : 
+                <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                  {row.endDate || 'NA'}
+                </StyledTableCell> }
 
-                          { ((selectedRow===row.id) || !row.created) ?
-                          <StyledTableCell align="center">
-                            <FormControl fullWidth>
-                              <Select
-                                value={row.priority}
-                                onChange={(e)=>handleProjDetailsChange(e,idx)}
-                                inputProps={{
-                                  name: 'priority',
-                                }}
-                                sx={{
-                                  fontSize: 18,
-                                  textAlign: 'center',
-                                  height: '45px',
-                                }}
-                                >
-                                <MenuItem value='Critical'>Critical</MenuItem>
-                                <MenuItem value='High'>High</MenuItem>
-                                <MenuItem value='Mid'>Mid</MenuItem>
-                                <MenuItem value='Low'>Low</MenuItem>
-                              </Select>
-                            </FormControl>
-                          </StyledTableCell>
-                          :
-                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
-                            {row.priority}
-                          </StyledTableCell> }
-
-                          { ((selectedRow===row.id) || !row.created) ?
-                          <StyledTableCell align="center">
-                            <LocalizationProvider dateAdapter={AdapterDayjs} name= 'endDate'>
-                              <DatePicker
-                                slotProps={{
-                                  textField: {
-                                    name: 'endDate'
-                                  }
-                                }}
-                                onChange={(val) => handleDateChange(val,idx)}
-                                format="DD/MM/YYYY"
-                              />
-                            </LocalizationProvider>
-                          </StyledTableCell>
-                          : 
-                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
-                            {row.endDate || 'NA'}
-                          </StyledTableCell> }
-
-                          <StyledTableCell align="center">
-                            <Box sx={{display: 'flex', justifyContent: 'center'}}>
-                              <StyledTableButton size="medium" variant="contained" endIcon={<DeleteIcon />} onClick={(e)=>remove(e,idx)}>Delete</StyledTableButton>
-                              <StyledTableButton size="medium" disabled={(selectedRow !== row.id)} variant="contained" endIcon={<SaveIcon />} onClick={saveProject}>Save</StyledTableButton>
-                            </Box>
-                          </StyledTableCell>
-                        </StyledTableRow>
-                    ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-          </Box>
-        </>
-    );
+                <StyledTableCell align="center">
+                  <Box sx={{display: 'flex', justifyContent: 'center'}}>
+                    <StyledTableButton size="medium" variant="contained" endIcon={<DeleteIcon />} onClick={(e)=>remove(e,idx)}>Delete</StyledTableButton>
+                    <StyledTableButton size="medium" disabled={(selectedRow !== row.id)} variant="contained" endIcon={<SaveIcon />} onClick={saveProject}>Save</StyledTableButton>
+                  </Box>
+                </StyledTableCell>
+              </StyledTableRow>
+            ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
+    </>
+  );
 }

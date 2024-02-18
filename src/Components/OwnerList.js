@@ -51,7 +51,7 @@ export const OwnerList = (props) => {
           id="demo-multiple-checkbox"
           multiple
           value={personName}
-          name="owner"
+          name="ownerList"
           onChange={handleChange}
           input={<OutlinedInput label="Tag" />}
           renderValue={(selected) => selected.join(', ')}
