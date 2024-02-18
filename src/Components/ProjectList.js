@@ -14,9 +14,8 @@ import url from '../Config/config'
 import { TextareaAutosize } from '@mui/base/TextareaAutosize';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import dayjs from 'dayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-
+import {OwnerList} from "./OwnerList";
 
 const StyledTextarea = styled(TextareaAutosize)(
   ({ theme }) => `
@@ -85,13 +84,13 @@ export const ProjectList = () => {
   }
   
   const [selectedRow,setSelectedRow] = useState('');
-  const [data,setData] = useState([]);
+  const [projectsData,setProjectsData] = useState([]);
   const [lastId,setLastId] = useState('');
   const [listItem,setListItem] = useState({...emptyList});
   const [isNameUnique,setIsNameUnique] = useState(true);
 
   useEffect(()=> {
-    (async () => await Load())();
+    (async () => await loadProjects())();
   },[]);
 
   const provideListItem = (item) => ({
@@ -104,7 +103,7 @@ export const ProjectList = () => {
     created: item.created,
   });
 
-  async function Load() {
+  async function loadProjects() {
     try {
       let result = await axios.get(url.api);
       result = result.data.map((element) => {
@@ -113,7 +112,7 @@ export const ProjectList = () => {
           created: true,
         }
       });
-      setData(result);
+      setProjectsData(result);
       console.log(result);
       setIsNameUnique(true); 
       result.length && setLastId(result[result.length-1].id);
@@ -124,12 +123,12 @@ export const ProjectList = () => {
     
   }
 
-  async function save(e) {
-    e.preventDefault();
+  async function saveProject(event) {
+    event.preventDefault();
 
     // Checking if name is not unique
     let flag = true;
-    data.forEach(row => {
+    projectsData.forEach(row => {
       if(row.name === listItem.name && row.id !== listItem.id) {
         setIsNameUnique(false);
         flag = false;
@@ -137,7 +136,6 @@ export const ProjectList = () => {
       }
     });
     if(!flag) return;
-
     const obj = {
       ...provideListItem(listItem),
     }
@@ -147,7 +145,7 @@ export const ProjectList = () => {
         let id = lastId !== '' ? lastId.substr(0,lastId.length-1) + (Number(lastId.substr(-1))+1) : 'PRJ1';
         obj.id = id;
         await axios.post(url.api, obj);
-        Load();
+        loadProjects();
         console.log('POST Request');
       }
       catch(err) {
@@ -158,7 +156,7 @@ export const ProjectList = () => {
       try {
         obj.id = listItem.id;
         await axios.put(url.api + listItem.id , obj);
-        Load();
+        loadProjects();
         console.log('PUT Request');
       }
     catch(err) {
@@ -172,16 +170,16 @@ export const ProjectList = () => {
 
   async function remove(e,idx) {
     e.preventDefault();
-    if(data[idx].id === '') {
+    if(projectsData[idx].id === '') {
       removeRow();
       return;
     }
 
     try {
-      await axios.delete(url.api + data[idx].id);
+      await axios.delete(url.api + projectsData[idx].id);
       setSelectedRow('');
       setLastId('');
-      Load();
+      loadProjects();
       }
     catch(err) {
         alert("Project List Deletion Failed !!");
@@ -189,36 +187,36 @@ export const ProjectList = () => {
   }
 
   const removeRow = () => {
-    let temp = [...data];
-    temp.pop();
-    setData(temp);
+    let data = [...projectsData];
+    data.pop();
+    setProjectsData(data);
     setIsNameUnique(true);
   }
 
   const handleClickInput = (e,idx) => {
-    if(data[idx].id !== listItem.id) setIsNameUnique(true);
-    const item = data[idx];
+    if(projectsData[idx].id !== listItem.id) setIsNameUnique(true);
+    const item = projectsData[idx];
     setSelectedRow(e.target.id);
     setListItem({
       ...provideListItem(item),
-      created: data[idx].created ? true: false
+      created: projectsData[idx].created ? true: false
     });
   }
 
-  const handleTextChange = (e,idx) => {
+  const handleProjDetailsChange = (e,idx) => {
     setIsNameUnique(true);
-    let temp = {...data[idx]};
-    let tempArray = [...data];
+    let temp = {...projectsData[idx]};
+    let data = [...projectsData];
     temp = {
       ...temp,
       [e.target.name]: e.target.value 
     };
-    tempArray[idx] = temp;
-    setData(tempArray);
-
+    data[idx] = temp;
+    setProjectsData(data);
+    
     setListItem({
       ...provideListItem(temp),
-      created: data[idx].created ? true: false
+      created: projectsData[idx].created ? true: false
     });
   }
 
@@ -230,49 +228,49 @@ export const ProjectList = () => {
         value: str
       }
     };
-    handleTextChange(obj,idx);
+    handleProjDetailsChange(obj,idx);
   }
 
   const addRow = () => {
-    let temp = [...data];
-    temp.push({...emptyList});
-    setData(temp);
+    let data = [...projectsData];
+    data.push({...emptyList});
+    setProjectsData(data);
   }
 
   const sortTableByName = () => {
-    const temp = [...data];
-    temp.sort(function(obj1,obj2) {
+    const data = [...projectsData];
+    data.sort(function(obj1,obj2) {
       if(obj1.name === '' && obj2.name !== '') return 1;
       if((obj2.name === '' && obj1.name !== '') || (obj1.name<obj2.name)) return -1;
       else return 1;
     });
-    setData(temp);
+    setProjectsData(data);
   }
 
   const sortTableById = () => {
-    const temp = [...data];
-    temp.sort(function(obj1,obj2) {
+    const data = [...projectsData];
+    data.sort(function(obj1,obj2) {
       if(obj1.id === '' && obj2.id !== '') return 1;
       if((obj2.id === '' && obj1.id !== '') || (obj1.id<obj2.id)) return -1;
       else return 1;
     });
-    setData(temp);
+    setProjectsData(data);
   }
 
   const sortTableByPriority = () => {
-    const temp = [...data];
+    const data = [...projectsData];
     const obj = {
       Low: '1',
       Mid: '2',
       High: '3',
       Critical: '4'
     }
-    temp.sort(function(obj1,obj2) {
+    data.sort(function(obj1,obj2) {
       if(obj1.priority === '' && obj2.priority !== '') return 1;
       if((obj2.priority === '' && obj1.priority !== '') || (obj[obj1.priority]<obj[obj2.priority])) return -1;
       else return 1;
     });
-    setData(temp);
+    setProjectsData(data);
   }
 
 
@@ -295,11 +293,11 @@ export const ProjectList = () => {
                         <StyledTableCell align="center">Owner</StyledTableCell>
                         <StyledTableCell align="center" onClick={sortTableByPriority}>Priority</StyledTableCell>
                         <StyledTableCell align="center">End Date</StyledTableCell>
-                        {data.length !== 0 && <StyledTableCell align="center">Option</StyledTableCell>}
+                        {projectsData.length !== 0 && <StyledTableCell align="center">Option</StyledTableCell>}
                     </TableRow>
                     </TableHead>
                     <TableBody>
-                    {data.map((row,idx) => (
+                    {projectsData.map((row,idx) => (
                         <StyledTableRow key={`key-${idx}`}>
                           <StyledTableCell align="center">{idx+1}</StyledTableCell>
 
@@ -314,7 +312,7 @@ export const ProjectList = () => {
                                 id={row.id}
                                 variant="outlined"
                                 value={row.name}
-                                onChange={(e)=>handleTextChange(e,idx)}
+                                onChange={(e)=>handleProjDetailsChange(e,idx)}
                                 inputProps={{
                                   name: 'name',
                                   style: {
@@ -337,7 +335,7 @@ export const ProjectList = () => {
                               minRows={2}
                               placeholder="describe your project"
                               value={row.description}
-                              onChange={(e)=>handleTextChange(e,idx)}
+                              onChange={(e)=>handleProjDetailsChange(e,idx)}
                               name= 'description'
                               maxLength={50}
                             />
@@ -347,32 +345,21 @@ export const ProjectList = () => {
                             {row.description}
                           </StyledTableCell> }                          
 
-                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
-                            { (selectedRow===row.id) || !row.created ?
-                              <TextField
-                                autoComplete="on"
-                                id={row.id}
-                                variant="outlined"
-                                value={row.owner}
-                                onChange={(e)=>handleTextChange(e,idx)}
-                                inputProps={{
-                                  name: 'owner',
-                                  style: {
-                                    height: '12px',
-                                    fontSize: 18,
-                                    textAlign: 'center'
-                                  }
-                                }}
-                                />
-                              :row.owner }
+                          { ((selectedRow===row.id) || !row.created) ?
+                          <StyledTableCell align="center" id={row.id}>
+                            <OwnerList handleProjDetailsChange={(e)=>handleProjDetailsChange(e,idx)}/>
                           </StyledTableCell>
+                          :
+                          <StyledTableCell align="center" id={row.id} onClick={(e) => handleClickInput(e,idx)}>
+                            {row.owner}
+                          </StyledTableCell> }
 
                           { ((selectedRow===row.id) || !row.created) ?
                           <StyledTableCell align="center">
                             <FormControl fullWidth>
                               <Select
                                 value={row.priority}
-                                onChange={(e)=>handleTextChange(e,idx)}
+                                onChange={(e)=>handleProjDetailsChange(e,idx)}
                                 inputProps={{
                                   name: 'priority',
                                 }}
@@ -416,7 +403,7 @@ export const ProjectList = () => {
                           <StyledTableCell align="center">
                             <Box sx={{display: 'flex', justifyContent: 'center'}}>
                               <StyledTableButton size="medium" variant="contained" endIcon={<DeleteIcon />} onClick={(e)=>remove(e,idx)}>Delete</StyledTableButton>
-                              <StyledTableButton size="medium" disabled={(selectedRow !== row.id)} variant="contained" endIcon={<SaveIcon />} onClick={save}>Save</StyledTableButton>
+                              <StyledTableButton size="medium" disabled={(selectedRow !== row.id)} variant="contained" endIcon={<SaveIcon />} onClick={saveProject}>Save</StyledTableButton>
                             </Box>
                           </StyledTableCell>
                         </StyledTableRow>
