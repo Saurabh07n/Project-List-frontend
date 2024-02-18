@@ -142,7 +142,7 @@ export const ProjectList = () => {
     
     if(!listItem.created) {
       try {
-        let id = lastId !== '' ? lastId.substr(0,lastId.length-1) + (Number(lastId.substr(-1))+1) : 'PRJ1';
+        let id = lastId !== '' ?lastId.substr(0,lastId.length-1) + (Number(lastId.substr(-1))+1) : 'PRJ1';
         obj.id = id;
         await axios.post(url.api, obj);
         loadProjects();
