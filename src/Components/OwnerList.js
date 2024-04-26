@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import OutlinedInput from '@mui/material/OutlinedInput';
-import InputLabel from '@mui/material/InputLabel';
+import { useState } from "react";
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import ListItemText from '@mui/material/ListItemText';
@@ -13,7 +11,7 @@ const MenuProps = {
   PaperProps: {
     style: {
       maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
+      width: 180,
     },
   },
 };
@@ -45,7 +43,7 @@ export const OwnerList = (props) => {
 
   return (
     <div>
-      <FormControl sx={{ m: 1, width: 300 }}>
+      <FormControl sx={{ m: 1, width: '80%' }}>
         <Select
           labelId="demo-multiple-checkbox-label"
           id="demo-multiple-checkbox"
@@ -53,13 +51,12 @@ export const OwnerList = (props) => {
           value={personName}
           name="ownerList"
           onChange={handleChange}
-          input={<OutlinedInput label="Tag" />}
           renderValue={(selected) => selected.join(', ')}
           MenuProps={MenuProps}
-          sx={{width: '84%',pl: '8%'}}
+          className="owner-dropdown"
         >
           {names.map((name) => (
-            <MenuItem key={name} value={name}>
+            <MenuItem key={name} value={name} className="menu-item">
               <Checkbox checked={personName.indexOf(name) > -1} />
               <ListItemText primary={name} />
             </MenuItem>

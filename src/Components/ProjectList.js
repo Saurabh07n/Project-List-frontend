@@ -24,7 +24,7 @@ const StyledTextarea = styled(TextareaAutosize)(
   font-weight: 400;
   line-height: 1.2;
   padding: 8px;
-  border-radius: 12px 12px 0 12px;
+  border-radius: 4px 4px 0 4px;
   color: ${theme.palette.mode === 'dark' ? theme.palette.text.disabled : theme.palette.text.primary};
   background: ${theme.palette.mode === 'dark' ? theme.palette.text.primary : '#fff'};
   border: 1px solid ${theme.palette.mode === 'dark' ? theme.palette.text.primary : theme.palette.text.disabled};
@@ -56,7 +56,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
       padding: 4  
     },
   }));
-  
+   
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
    backgroundColor: theme.palette.action.hover,
@@ -283,16 +283,16 @@ export const ProjectList = () => {
         <TableContainer component={Paper}>
           <Table  aria-label="customized table">
             <TableHead>
-            <TableRow>
-              <StyledTableCell style={{width:'5%'}} align="center">#</StyledTableCell>
-              <StyledTableCell align="center" onClick={sortTableById}>Project ID</StyledTableCell>
-              <StyledTableCell align="center" onClick={sortTableByName}>Project Name</StyledTableCell>
-              <StyledTableCell align="center" sx={{width: '15% !important'}}>Description</StyledTableCell>
-              <StyledTableCell align="center">Owner</StyledTableCell>
-              <StyledTableCell align="center" onClick={sortTableByPriority}>Priority</StyledTableCell>
-              <StyledTableCell align="center">End Date</StyledTableCell>
-              {projectsData.length !== 0 && <StyledTableCell align="center">Option</StyledTableCell>}
-            </TableRow>
+              <TableRow>
+                <StyledTableCell style={{width:'5%'}} align="center">#</StyledTableCell>
+                <StyledTableCell align="center" onClick={sortTableById}>Project ID</StyledTableCell>
+                <StyledTableCell align="center" onClick={sortTableByName}>Project Name</StyledTableCell>
+                <StyledTableCell align="center" sx={{width: '15% !important'}}>Description</StyledTableCell>
+                <StyledTableCell align="center">Owner</StyledTableCell>
+                <StyledTableCell align="center" onClick={sortTableByPriority}>Priority</StyledTableCell>
+                <StyledTableCell align="center">End Date</StyledTableCell>
+                {projectsData.length !== 0 && <StyledTableCell align="center">Option</StyledTableCell>}
+              </TableRow>
             </TableHead>
             <TableBody>
             {projectsData.map((row,idx) => (
@@ -336,6 +336,7 @@ export const ProjectList = () => {
                     onChange={(e)=>handleProjDetailsChange(e,idx)}
                     name= 'description'
                     maxLength={50}
+                    className="description-textarea"
                   />
                 </StyledTableCell>
                 :
@@ -361,11 +362,7 @@ export const ProjectList = () => {
                       inputProps={{
                         name: 'priority',
                       }}
-                      sx={{
-                        fontSize: 18,
-                        textAlign: 'center',
-                        height: '45px',
-                      }}
+                      className="priority-dropdown"
                       >
                       <MenuItem value='Critical'>Critical</MenuItem>
                       <MenuItem value='High'>High</MenuItem>
@@ -390,6 +387,7 @@ export const ProjectList = () => {
                       }}
                       onChange={(val) => handleDateChange(val,idx)}
                       format="DD/MM/YYYY"
+                      className="date-selector"
                     />
                   </LocalizationProvider>
                 </StyledTableCell>

@@ -5,3 +5,31 @@
 #mui-component-select-priority {
   padding-right: 14px;
 }
+
+.priority-dropdown {
+  font-size: 18;
+  text-align: center;
+  height: 44px;
+}
+
+.date-selector div {
+  height: 44px;
+}
+
+.description-textarea {
+  height: 24px !important;
+}
+
+.owner-dropdown {
+  height: 44px;
+  width: 150px;
+  margin: 0 auto;
+}
+
+.menu-item {
+  padding-left: 4px !important;
+}
+
+.menu-item span {
+  padding: 4px;
+}
