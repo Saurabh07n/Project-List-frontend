@@ -72,7 +72,7 @@ const StyledTableButton = styled(Button)(({ theme }) => ({
   borderRadius: '24px',
 }));
 
-export const ProjectList = () => {
+export const ProjectList = (props) => {
 
   const emptyList = {
     id: '',
@@ -275,7 +275,7 @@ export const ProjectList = () => {
 
   return (
     <>
-      <Box sx={{position:'relative', left: 280, top: 120,px:'4%', width: 'calc(92% - 280px)' }}>
+      <Box className={props.tableClass} >
         <Button variant="outlined" disabled={!isNameUnique} startIcon={<AddCircleIcon/>} onClick={addRow} size="small" sx={{float: 'right',mr:0,mb:1, borderRadius: '24px', border: 1}} >
           Add
         </Button>
